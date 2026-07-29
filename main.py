@@ -5,8 +5,8 @@ import plotly.express as px
 st.set_page_config(page_title="IE6600 Dashboard", layout="wide")
 
 # load data
-df_2015 = pd.read_csv("acs2015_county_data.csv")
-df_2017 = pd.read_csv("acs2017_county_data.csv")
+df_2015 = pd.read_csv("data/acs2015_county_data.csv")
+df_2017 = pd.read_csv("data/acs2017_county_data.csv")
 
 df_2015["Year"] = 2015
 df_2017["Year"] = 2017
