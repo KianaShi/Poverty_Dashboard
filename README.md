@@ -1,6 +1,6 @@
 # Industry, Household & Children: A Multi-Perspective Analysis of U.S. Poverty
 ## Live Demo
-🌐 Streamlit Dashboard: https://poverty-ndfuumoeuajtk9dwjpebew.streamlit.app/
+🌐 Streamlit Dashboard: [https://poverty-ndfuumoeuajtk9dwjpebew.streamlit.app/](https://poverty-dashboard-shi-yang.streamlit.app/)
 ![Dashboard](images/dashboard.png)
 ## Overview
 This project explores the relationship between occupational structure and poverty across U.S. counties using the American Community Survey (ACS) datasets from 2015 and 2017.
