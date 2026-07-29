@@ -6,6 +6,7 @@ This project explores the relationship between occupational structure and povert
 The objective was to investigate how employment composition influences regional poverty levels and to build an interactive dashboard that enables users to explore geographic and socioeconomic patterns through visual analytics.
 
 This project was completed as a two-person team project.
+
 **link**: https://poverty-ndfuumoeuajtk9dwjpebew.streamlit.app/
 
 ## My Contributions
