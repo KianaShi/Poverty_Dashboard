@@ -12,15 +12,21 @@ st.set_page_config(
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');
-    :root { --ink:#18232b; --muted:#718087; --line:#e7ecec; --paper:#ffffff; --canvas:#f3f6f5; --teal:#13a8a3; --pink:#ee86b7; --lime:#b9db72; }
+    :root { --ink:#29211f; --muted:#7c6f69; --line:#eee7e2; --paper:#ffffff; --canvas:#f7f4f1; --teal:#ef6c35; --pink:#c9382b; --lime:#f4a261; }
     html, body, [class*="css"] { font-family:'DM Sans',sans-serif; color:var(--ink); }
     .stApp { background:var(--canvas); }
     .block-container { max-width:1500px; padding:1.4rem 2rem 4rem; }
-    [data-testid="stSidebar"] { background:#14201f; border-right:0; min-width:230px; max-width:230px; }
-    [data-testid="stSidebar"] * { color:#eaf3f1 !important; }
+    [data-testid="stSidebar"] { background:#241916; border-right:0; min-width:250px; max-width:250px; }
+    [data-testid="stSidebar"] * { color:#fff8f4 !important; }
+    [data-testid="stSidebar"] label { color:#fff8f4 !important; font-size:.86rem !important; font-weight:700 !important; }
+    [data-testid="stSidebar"] [data-baseweb="select"] > div { background:#fffaf7 !important; border:1px solid #80665c !important; }
+    [data-testid="stSidebar"] [data-baseweb="select"] input,
+    [data-testid="stSidebar"] [data-baseweb="select"] div { color:#2d211d !important; -webkit-text-fill-color:#2d211d !important; }
+    [data-testid="stSidebar"] [data-testid="stSlider"] p { color:#fff8f4 !important; font-weight:600 !important; }
+    [data-testid="stSidebar"] [data-testid="stSlider"] div[role="slider"] { background:#ef6c35 !important; border-color:#fff !important; }
     [data-testid="stSidebar"] .stRadio label { padding:.55rem .7rem; border-radius:10px; }
     [data-testid="stSidebar"] .stRadio label:has(input:checked) { background:#243432; }
-    [data-testid="stSidebar"] hr { border-color:#31413f; }
+    [data-testid="stSidebar"] hr { border-color:#55413a; }
     h1,h2,h3 { font-family:'Manrope',sans-serif !important; letter-spacing:-.035em; color:var(--ink); }
     h2 { font-size:1.18rem !important; margin:.1rem 0 .8rem !important; }
     h3 { font-size:.98rem !important; }
@@ -28,7 +34,7 @@ st.markdown("""
     .hero h1 { font-size:clamp(1.7rem,2.6vw,2.6rem); line-height:1.08; margin:.25rem 0 .4rem; max-width:850px; }
     .hero p { color:var(--muted); margin:0; max-width:760px; font-size:.96rem; }
     .eyebrow { color:var(--teal); font-weight:700; font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; }
-    .year-badge { background:#e6f7f4; color:#087f7b; padding:.45rem .75rem; border-radius:999px; font-weight:700; font-size:.78rem; white-space:nowrap; }
+    .year-badge { background:#fff0e8; color:#bd3c25; padding:.45rem .75rem; border-radius:999px; font-weight:700; font-size:.78rem; white-space:nowrap; }
     .section-card, [data-testid="stVerticalBlockBorderWrapper"] { background:var(--paper); border:1px solid var(--line) !important; border-radius:16px !important; box-shadow:0 8px 30px rgba(21,44,41,.045); }
     [data-testid="stVerticalBlockBorderWrapper"] { padding:.85rem 1rem; }
     div[data-testid="stSelectbox"] > label, div[data-testid="stSlider"] > label { color:#62716f; font-size:.78rem; font-weight:700; }
@@ -37,10 +43,10 @@ st.markdown("""
     .kpi { background:#fff; border:1px solid var(--line); border-radius:14px; padding:1rem 1.1rem; box-shadow:0 6px 22px rgba(21,44,41,.035); }
     .kpi-label { color:var(--muted); font-size:.75rem; font-weight:600; }
     .kpi-value { font-family:'Manrope',sans-serif; font-size:1.65rem; font-weight:800; letter-spacing:-.04em; margin:.2rem 0; }
-    .kpi-note { color:#169e89; font-size:.72rem; font-weight:700; }
+    .kpi-note { color:#d5532f; font-size:.72rem; font-weight:700; }
     .sidebar-brand { font-family:'Manrope',sans-serif; font-size:1.08rem; font-weight:800; padding:.5rem .1rem 1.1rem; }
     .sidebar-brand span { display:inline-grid; place-items:center; width:28px; height:28px; border-radius:9px; background:var(--teal); margin-right:8px; }
-    .side-note { color:#a7b8b4 !important; font-size:.72rem; line-height:1.55; }
+    .side-note { color:#ead8d0 !important; font-size:.76rem; line-height:1.6; }
     hr { border:none; border-top:1px solid var(--line); margin:1.25rem 0; }
     [data-testid="stPlotlyChart"] { border-radius:14px; overflow:hidden; }
     [data-testid="stAlert"] { border-radius:11px; border:0; font-size:.82rem; }
@@ -316,7 +322,7 @@ with left1:
         filtered_df,
         x="Poverty",
         nbins=20,
-        color_discrete_sequence=["#ee86b7"]
+        color_discrete_sequence=["#ef6c35"]
     )
     fig1.update_layout(
         template="plotly_white",
@@ -378,7 +384,7 @@ with left4:
         hover_name="County",
         hover_data=["State"],
         trendline="ols",
-        color_discrete_sequence=["#13a8a3"]
+        color_discrete_sequence=["#dc4b2f"]
     )
 
     fig4.update_traces(marker=dict(size=5, opacity=0.5))
@@ -454,7 +460,7 @@ with left2:
         x="CountyLabel",
         y="ChildPoverty",
         color="Rank",
-        color_continuous_scale=[[0, "#b7e4df"], [0.55, "#7ccfc8"], [1, "#ee86b7"]]
+        color_continuous_scale="OrRd"
     )
     fig2.update_layout(
         template="plotly_white",
