@@ -2,7 +2,59 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-st.set_page_config(page_title="IE6600 Dashboard", layout="wide")
+st.set_page_config(
+    page_title="Poverty Lens | U.S. County Dashboard",
+    page_icon="◒",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
+st.markdown("""
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');
+    :root { --ink:#18232b; --muted:#718087; --line:#e7ecec; --paper:#ffffff; --canvas:#f3f6f5; --teal:#13a8a3; --pink:#ee86b7; --lime:#b9db72; }
+    html, body, [class*="css"] { font-family:'DM Sans',sans-serif; color:var(--ink); }
+    .stApp { background:var(--canvas); }
+    .block-container { max-width:1500px; padding:1.4rem 2rem 4rem; }
+    [data-testid="stSidebar"] { background:#14201f; border-right:0; min-width:230px; max-width:230px; }
+    [data-testid="stSidebar"] * { color:#eaf3f1 !important; }
+    [data-testid="stSidebar"] .stRadio label { padding:.55rem .7rem; border-radius:10px; }
+    [data-testid="stSidebar"] .stRadio label:has(input:checked) { background:#243432; }
+    [data-testid="stSidebar"] hr { border-color:#31413f; }
+    h1,h2,h3 { font-family:'Manrope',sans-serif !important; letter-spacing:-.035em; color:var(--ink); }
+    h2 { font-size:1.18rem !important; margin:.1rem 0 .8rem !important; }
+    h3 { font-size:.98rem !important; }
+    .hero { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; margin:.2rem 0 1.25rem; }
+    .hero h1 { font-size:clamp(1.7rem,2.6vw,2.6rem); line-height:1.08; margin:.25rem 0 .4rem; max-width:850px; }
+    .hero p { color:var(--muted); margin:0; max-width:760px; font-size:.96rem; }
+    .eyebrow { color:var(--teal); font-weight:700; font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; }
+    .year-badge { background:#e6f7f4; color:#087f7b; padding:.45rem .75rem; border-radius:999px; font-weight:700; font-size:.78rem; white-space:nowrap; }
+    .section-card, [data-testid="stVerticalBlockBorderWrapper"] { background:var(--paper); border:1px solid var(--line) !important; border-radius:16px !important; box-shadow:0 8px 30px rgba(21,44,41,.045); }
+    [data-testid="stVerticalBlockBorderWrapper"] { padding:.85rem 1rem; }
+    div[data-testid="stSelectbox"] > label, div[data-testid="stSlider"] > label { color:#62716f; font-size:.78rem; font-weight:700; }
+    div[data-baseweb="select"] > div { background:#fff; border-color:var(--line); border-radius:10px; }
+    .kpi-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:.35rem 0 1.2rem; }
+    .kpi { background:#fff; border:1px solid var(--line); border-radius:14px; padding:1rem 1.1rem; box-shadow:0 6px 22px rgba(21,44,41,.035); }
+    .kpi-label { color:var(--muted); font-size:.75rem; font-weight:600; }
+    .kpi-value { font-family:'Manrope',sans-serif; font-size:1.65rem; font-weight:800; letter-spacing:-.04em; margin:.2rem 0; }
+    .kpi-note { color:#169e89; font-size:.72rem; font-weight:700; }
+    .sidebar-brand { font-family:'Manrope',sans-serif; font-size:1.08rem; font-weight:800; padding:.5rem .1rem 1.1rem; }
+    .sidebar-brand span { display:inline-grid; place-items:center; width:28px; height:28px; border-radius:9px; background:var(--teal); margin-right:8px; }
+    .side-note { color:#a7b8b4 !important; font-size:.72rem; line-height:1.55; }
+    hr { border:none; border-top:1px solid var(--line); margin:1.25rem 0; }
+    [data-testid="stPlotlyChart"] { border-radius:14px; overflow:hidden; }
+    [data-testid="stAlert"] { border-radius:11px; border:0; font-size:.82rem; }
+    .stCaption { color:#8b9896; }
+    @media (max-width:900px) { .block-container{padding:1rem;} .hero{flex-direction:column;} .kpi-grid{grid-template-columns:1fr;} [data-testid="stSidebar"]{min-width:200px;} }
+</style>
+""", unsafe_allow_html=True)
+
+with st.sidebar:
+    st.markdown('<div class="sidebar-brand"><span>◒</span>Poverty Lens</div>', unsafe_allow_html=True)
+    st.caption("EXPLORE")
+    st.radio("Dashboard navigation", ["Overview", "State Map", "Distribution", "Occupation", "Child Poverty"], label_visibility="collapsed")
+    st.divider()
+    st.markdown('<div class="side-note">ACS county data<br>2015 + 2017 editions</div>', unsafe_allow_html=True)
 
 # load data
 df_2015 = pd.read_csv("data/acs2015_county_data.csv")
@@ -25,11 +77,16 @@ for col in numeric_cols:
 df = df.dropna(subset=["State", "County", "Income", "Poverty"])
 
 # title
-st.title("Industry, Household & Children: A Multi-Perspective Analysis of U.S. Poverty")
-st.markdown(
-    "This dashboard compares county-level data from **2015** and **2017** to explore "
-    "how occupational structure relates to **poverty** and **income** across U.S. counties."
-)
+st.markdown("""
+<div class="hero">
+  <div>
+    <div class="eyebrow">United States · County intelligence</div>
+    <h1>Poverty, work and childhood — in one view.</h1>
+    <p>Explore how household income and occupational structure shape poverty across U.S. counties, with focused analysis for every chart.</p>
+  </div>
+  <div class="year-badge">ACS · 2 editions</div>
+</div>
+""", unsafe_allow_html=True)
 
 # Feature Selection
 f1, f2, f3 = st.columns(3)
@@ -63,13 +120,13 @@ filtered_df = filtered_df[
 ]
 
 # KPI
-k1, k2, k3 = st.columns(3)
-with k1:
-    st.metric("Counties Shown", f"{filtered_df.shape[0]:,}")
-with k2:
-    st.metric("Average Poverty", f"{filtered_df['Poverty'].mean():.1f}%")
-with k3:
-    st.metric("Average Income", f"${filtered_df['Income'].mean():,.0f}")
+st.markdown(f"""
+<div class="kpi-grid">
+  <div class="kpi"><div class="kpi-label">Counties in view</div><div class="kpi-value">{filtered_df.shape[0]:,}</div><div class="kpi-note">Filtered county sample</div></div>
+  <div class="kpi"><div class="kpi-label">Average poverty</div><div class="kpi-value">{filtered_df['Poverty'].mean():.1f}%</div><div class="kpi-note">Share of residents</div></div>
+  <div class="kpi"><div class="kpi-label">Average household income</div><div class="kpi-value">${filtered_df['Income'].mean():,.0f}</div><div class="kpi-note">Across selected counties</div></div>
+</div>
+""", unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -191,7 +248,7 @@ with map_left:
             "lon": False,
             "Label": False
         },
-        color_continuous_scale="OrRd",
+        color_continuous_scale=[[0, "#e7f7f4"], [0.45, "#72d2cc"], [0.75, "#f1a7c8"], [1, "#d94f91"]],
         labels={
             "Poverty": "Avg Poverty Rate (%)",
             "Income": "Avg Income",
@@ -213,13 +270,17 @@ with map_left:
         template="plotly_white",
         margin=dict(l=10, r=10, t=20, b=10),
         height=560,
+        paper_bgcolor="rgba(0,0,0,0)",
+        font=dict(family="DM Sans", color="#50605e"),
+        coloraxis_colorbar=dict(thickness=8, outlinewidth=0),
         geo=dict(bgcolor="rgba(0,0,0,0)")
     )
 
-    st.plotly_chart(fig_map, use_container_width=True)
+    st.plotly_chart(fig_map, width="stretch")
 
 with map_right:
-    st.markdown("### Map Insight")
+  with st.container(border=True):
+    st.markdown("### Map insight")
 
     if len(state_summary) > 0:
         top_state = state_summary.sort_values("Poverty", ascending=False).iloc[0]
@@ -240,7 +301,7 @@ with map_right:
         for _, row in occ_counts.iterrows():
             st.write(f"- {row['Occupation']}: **{row['State Count']} states**")
 
-        st.info("Color shows average poverty by state. Text shows state abbreviation and dominant occupation.")
+        st.info("Darker color means higher poverty. Labels pair each state with its dominant occupation.")
     else:
         st.write("No state-level data available for the current selection.")
 
@@ -258,17 +319,21 @@ with left1:
         filtered_df,
         x="Poverty",
         nbins=20,
-        color_discrete_sequence=["#E45756"]
+        color_discrete_sequence=["#ee86b7"]
     )
     fig1.update_layout(
         template="plotly_white",
         margin=dict(l=10, r=10, t=20, b=10),
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="#fbfcfc",
+        font=dict(family="DM Sans", color="#50605e"),
         xaxis_title="Poverty Rate",
-        yaxis_title="Number of Counties"
+        yaxis_title="Number of Counties",
+        bargap=.12
     )
-    st.plotly_chart(fig1, use_container_width=True)
+    st.plotly_chart(fig1, width="stretch")
 
 with right1:
+  with st.container(border=True):
     avg_poverty = filtered_df["Poverty"].mean()
     median_poverty = filtered_df["Poverty"].median()
     max_poverty = filtered_df["Poverty"].max()
@@ -277,7 +342,7 @@ with right1:
     high_poverty_count = (filtered_df["Poverty"] >= 20).sum()
     high_poverty_pct = high_poverty_count / len(filtered_df) * 100 if len(filtered_df) > 0 else 0
 
-    st.markdown("### Quick Analysis")
+    st.markdown("### Quick analysis")
     st.write(f"Average poverty rate: **{avg_poverty:.1f}%**")
     st.write(f"Median poverty rate: **{median_poverty:.1f}%**")
     st.write(f"Range: **{min_poverty:.1f}% – {max_poverty:.1f}%**")
@@ -320,7 +385,7 @@ with left4:
         hover_name="County",
         hover_data=["State"],
         trendline="ols",
-        color_discrete_sequence=["#2A9D8F"]
+        color_discrete_sequence=["#13a8a3"]
     )
 
     fig4.update_traces(marker=dict(size=5, opacity=0.5))
@@ -328,16 +393,19 @@ with left4:
     fig4.update_layout(
         template="plotly_white",
         margin=dict(l=10, r=10, t=20, b=10),
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="#fbfcfc",
+        font=dict(family="DM Sans", color="#50605e"),
         xaxis_title=occupation_col,
         yaxis_title="Poverty Rate"
     )
 
-    st.plotly_chart(fig4, use_container_width=True)
+    st.plotly_chart(fig4, width="stretch")
 
 
 # ===== right =====
 with right4:
-    st.markdown("### Trend Analysis")
+  with st.container(border=True):
+    st.markdown("### Trend analysis")
 
     if len(filtered_df) > 0:
         corr = filtered_df[occupation_col].corr(filtered_df["Poverty"])
@@ -387,19 +455,22 @@ with left2:
         x="CountyLabel",
         y="ChildPoverty",
         color="Rank",
-        color_continuous_scale="OrRd"
+        color_continuous_scale=[[0, "#b7e4df"], [0.55, "#7ccfc8"], [1, "#ee86b7"]]
     )
     fig2.update_layout(
         template="plotly_white",
         margin=dict(l=10, r=10, t=20, b=10),
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="#fbfcfc",
+        font=dict(family="DM Sans", color="#50605e"),
         xaxis_title="County",
         yaxis_title="Child Poverty Rate",
         coloraxis_showscale=False
     )
-    st.plotly_chart(fig2, use_container_width=True)
+    st.plotly_chart(fig2, width="stretch")
 
 with right2:
-    st.markdown("### Quick Analysis")
+  with st.container(border=True):
+    st.markdown("### Quick analysis")
 
     if len(top_counties) > 0:
         top1 = top_counties.iloc[0]
