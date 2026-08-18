@@ -49,13 +49,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-with st.sidebar:
-    st.markdown('<div class="sidebar-brand"><span>◒</span>Poverty Lens</div>', unsafe_allow_html=True)
-    st.caption("EXPLORE")
-    st.radio("Dashboard navigation", ["Overview", "State Map", "Distribution", "Occupation", "Child Poverty"], label_visibility="collapsed")
-    st.divider()
-    st.markdown('<div class="side-note">ACS county data<br>2015 + 2017 editions</div>', unsafe_allow_html=True)
-
 # load data
 df_2015 = pd.read_csv("data/acs2015_county_data.csv")
 df_2017 = pd.read_csv("data/acs2017_county_data.csv")
@@ -76,6 +69,27 @@ for col in numeric_cols:
 
 df = df.dropna(subset=["State", "County", "Income", "Poverty"])
 
+with st.sidebar:
+    st.markdown('<div class="sidebar-brand"><span>◒</span>Poverty Lens</div>', unsafe_allow_html=True)
+    st.caption("FILTER THE DATA")
+    year = st.selectbox("Data year", [2015, 2017])
+    selected_state = st.selectbox(
+        "State",
+        ["All states"] + sorted(df["State"].dropna().unique().tolist())
+    )
+    poverty_range = st.slider(
+        "County poverty rate (%)",
+        float(df["Poverty"].min()),
+        float(df["Poverty"].max()),
+        (float(df["Poverty"].min()), float(df["Poverty"].max()))
+    )
+    occupation_col = st.selectbox(
+        "Occupation to compare",
+        ["Professional", "Service", "Office", "Construction", "Production"]
+    )
+    st.divider()
+    st.markdown('<div class="side-note"><b>How to use</b><br>Adjust any filter above. Every chart and analysis card updates automatically.<br><br>Source: ACS county data, 2015 + 2017.</div>', unsafe_allow_html=True)
+
 # title
 st.markdown("""
 <div class="hero">
@@ -88,30 +102,11 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Feature Selection
-f1, f2, f3 = st.columns(3)
-
-with f1:
-    year = st.selectbox("Year", [2015, 2017])
-
-with f2:
-    selected_state = st.selectbox(
-        "State",
-        ["All"] + sorted(df["State"].dropna().unique().tolist())
-    )
-
-with f3:
-    poverty_range = st.slider(
-        "Poverty Range",
-        float(df["Poverty"].min()),
-        float(df["Poverty"].max()),
-        (float(df["Poverty"].min()), float(df["Poverty"].max()))
-    )
-
 # filter
-filtered_df = df[df["Year"] == year].copy()
+year_df = df[df["Year"] == year].copy()
+filtered_df = year_df.copy()
 
-if selected_state != "All":
+if selected_state != "All states":
     filtered_df = filtered_df[filtered_df["State"] == selected_state]
 
 filtered_df = filtered_df[
@@ -248,7 +243,7 @@ with map_left:
             "lon": False,
             "Label": False
         },
-        color_continuous_scale=[[0, "#e7f7f4"], [0.45, "#72d2cc"], [0.75, "#f1a7c8"], [1, "#d94f91"]],
+        color_continuous_scale="OrRd",
         labels={
             "Poverty": "Avg Poverty Rate (%)",
             "Income": "Avg Income",
@@ -296,9 +291,11 @@ with map_right:
         st.write(f"States shown: **{len(state_summary)}**")
         st.write(f"Highest avg poverty: **{top_state['State']} ({top_state['Poverty']:.1f}%)**")
         st.write(f"Lowest avg poverty: **{low_state['State']} ({low_state['Poverty']:.1f}%)**")
+        st.write(f"State-level spread: **{top_state['Poverty'] - low_state['Poverty']:.1f} points**")
+        st.write(f"Highest-poverty state income: **${top_state['Income']:,.0f}**")
 
         st.markdown("**Dominant occupation across states:**")
-        for _, row in occ_counts.iterrows():
+        for _, row in occ_counts.head(3).iterrows():
             st.write(f"- {row['Occupation']}: **{row['State Count']} states**")
 
         st.info("Darker color means higher poverty. Labels pair each state with its dominant occupation.")
@@ -341,13 +338,19 @@ with right1:
 
     high_poverty_count = (filtered_df["Poverty"] >= 20).sum()
     high_poverty_pct = high_poverty_count / len(filtered_df) * 100 if len(filtered_df) > 0 else 0
+    q1 = filtered_df["Poverty"].quantile(.25)
+    q3 = filtered_df["Poverty"].quantile(.75)
+    national_avg = year_df["Poverty"].mean()
+    avg_gap = avg_poverty - national_avg
 
     st.markdown("### Quick analysis")
     st.write(f"Average poverty rate: **{avg_poverty:.1f}%**")
     st.write(f"Median poverty rate: **{median_poverty:.1f}%**")
     st.write(f"Range: **{min_poverty:.1f}% – {max_poverty:.1f}%**")
+    st.write(f"Middle 50% of counties: **{q1:.1f}% – {q3:.1f}%**")
     st.write(f"Counties with poverty ≥ 20%: **{high_poverty_count}**")
     st.write(f"Share of high-poverty counties: **{high_poverty_pct:.1f}%**")
+    st.write(f"Vs. {year} national county average: **{avg_gap:+.1f} points**")
 
     if avg_poverty >= 20:
         st.info("Poverty is relatively high in the current selection.")
@@ -358,16 +361,6 @@ with right1:
 
 st.caption("This chart shows how poverty rates are distributed across counties in the selected data.")
 
-#occupation
-
-st.markdown("---")
-
-st.subheader("Select Occupation for Analysis")
-
-occupation_col = st.selectbox(
-    "Occupation",
-    ["Professional", "Service", "Office", "Construction", "Production"]
-)
 st.markdown("---")
 
 # ===== Section 3: Poverty vs Occupation =====
@@ -411,10 +404,16 @@ with right4:
         corr = filtered_df[occupation_col].corr(filtered_df["Poverty"])
         avg_occ = filtered_df[occupation_col].mean()
         avg_poverty = filtered_df["Poverty"].mean()
+        median_occ = filtered_df[occupation_col].median()
+        highest_occ = filtered_df.nlargest(1, occupation_col).iloc[0]
+        strongest_poverty = filtered_df.nlargest(1, "Poverty").iloc[0]
 
         st.write(f"Average {occupation_col}: **{avg_occ:.1f}%**")
+        st.write(f"Median {occupation_col}: **{median_occ:.1f}%**")
         st.write(f"Average poverty: **{avg_poverty:.1f}%**")
         st.write(f"Correlation: **{corr:.2f}**")
+        st.write(f"Highest {occupation_col.lower()} share: **{highest_occ['County']}, {highest_occ['State']} ({highest_occ[occupation_col]:.1f}%)**")
+        st.write(f"Highest poverty in view: **{strongest_poverty['County']}, {strongest_poverty['State']} ({strongest_poverty['Poverty']:.1f}%)**")
 
         # auto explain
         if corr > 0.4:
@@ -478,11 +477,19 @@ with right2:
 
         overall_avg = filtered_df["ChildPoverty"].mean()
         gap = top1["ChildPoverty"] - overall_avg
+        median_child = filtered_df["ChildPoverty"].median()
+        severe_count = (filtered_df["ChildPoverty"] >= 30).sum()
+        severe_share = severe_count / len(filtered_df) * 100 if len(filtered_df) else 0
+        top_state_child = top_counties.groupby("State").size().sort_values(ascending=False)
 
         st.write(f"Highest child-poverty county: **{top1['County']}, {top1['State']}**")
         st.write(f"Top child poverty rate: **{top1['ChildPoverty']:.1f}%**")
         st.write(f"Average among top 10 counties: **{avg_top10:.1f}%**")
+        st.write(f"Median across all counties: **{median_child:.1f}%**")
         st.write(f"Gap from overall average: **{gap:.1f} percentage points**")
+        st.write(f"Counties at or above 30%: **{severe_count} ({severe_share:.1f}%)**")
+        if len(top_state_child) > 0:
+            st.write(f"Most represented state in top 10: **{top_state_child.index[0]} ({top_state_child.iloc[0]} counties)**")
 
         if gap > 10:
             st.info("Child poverty is highly concentrated in the top counties, indicating strong inequality.")
